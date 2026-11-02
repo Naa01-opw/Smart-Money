@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catatan Keuangan</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f1;--sf:#fff;--ink:#12262b;--mut:#5d7176;--ln:#d5e0dd;--in:#0b7a63;--out:#c4423a;--ac:#12262b;--acf:#fff;--tr:#e3ece9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a1d;--sf:#16272b;--ink:#e6f0ee;--mut:#8fa6aa;--ln:#2a3f43;--in:#3cc4a3;--out:#ff7a70;--ac:#e6f0ee;--acf:#0e1a1d;--tr:#1f3236;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1a1d;--sf:#16272b;--ink:#e6f0ee;--mut:#8fa6aa;--ln:#2a3f43;--in:#3cc4a3;--out:#ff7a70;--ac:#e6f0ee;--acf:#0e1a1d;--tr:#1f3236;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+h1{font-size:22px;font-weight:800;margin:0;letter-spacing:-.02em}
+h2{font-size:16px;font-weight:700;margin:0 0 12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input,select,button{font:inherit;color:var(--ink)}
+input,select{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:9px 11px;width:100%;min-width:0}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--in);outline-offset:1px}
+button{cursor:pointer;border:1px solid var(--ln);background:var(--sf);border-radius:8px;padding:9px 14px;font-weight:500}
+button.pri{background:var(--ac);color:var(--acf);border-color:var(--ac);font-weight:700}
+button.sm{padding:5px 9px;font-size:13px}
+.hero{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.box{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:16px}
+.lbl{color:var(--mut);font-size:13px}
+.big{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.mid{font-size:20px;font-weight:700;margin-top:2px}
+.in{color:var(--in)}.out{color:var(--out)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.f{display:grid;gap:10px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--tr);border-radius:9px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:7px}
+.seg button.on{background:var(--sf);font-weight:700;box-shadow:0 0 0 1px var(--ln)}
+.bar{height:10px;background:var(--tr);border-radius:6px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--in);border-radius:6px;transition:width .3s}
+.bar>i.warn{background:#d9962b}.bar>i.over{background:var(--out)}
+.cat{margin-bottom:10px}
+.cat .t{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}
+.cat .bar>i{background:var(--out)}
+.tx{display:flex;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--ln)}
+.tx:first-child{border-top:0}
+.dot{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:var(--tr);flex:none}
+.tx .m{flex:1;min-width:0}
+.tx .m b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx .m span{color:var(--mut);font-size:13px}
+.amt{font-weight:700;white-space:nowrap}
+.empty{color:var(--mut);padding:18px 0;text-align:center}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:8px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ac);color:var(--acf);padding:9px 16px;border-radius:9px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+@media (max-width:720px){.hero,.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.big{font-size:25px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Catatan Keuangan</h1>
+    <div class="row">
+      <button id="prev" aria-label="Bulan sebelumnya">‹</button>
+      <input type="month" id="month" style="width:auto" aria-label="Pilih bulan">
+      <button id="next" aria-label="Bulan berikutnya">›</button>
+      <button id="theme" aria-label="Ganti tema">◐</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="box"><div class="lbl">Sisa uang bulan ini</div><div class="big" id="sBal">Rp0</div></div>
+    <div class="box"><div class="lbl">Pemasukan</div><div class="mid in" id="sIn">Rp0</div></div>
+    <div class="box"><div class="lbl">Pengeluaran</div><div class="mid out" id="sOut">Rp0</div></div>
+  </section>
+
+  <section class="box" style="margin-bottom:12px">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h2 style="margin:0">Anggaran bulanan</h2>
+      <div class="row"><input id="budget" inputmode="numeric" placeholder="Atur batas, mis. 3.000.000" style="width:200px" aria-label="Batas anggaran"><button class="sm" id="saveBudget">Simpan</button></div>
+    </div>
+    <div class="bar"><i id="bFill" style="width:0"></i></div>
+    <div class="lbl" id="bText" style="margin-top:6px">Belum ada batas anggaran untuk bulan ini.</div>
+  </section>
+
+  <div class="grid">
+    <section class="box">
+      <h2 id="formTitle">Tambah transaksi</h2>
+      <form class="f" id="form" onsubmit="return false">
+        <div class="seg" role="group" aria-label="Jenis transaksi">
+          <button type="button" id="tOut" class="on">Pengeluaran</button>
+          <button type="button" id="tIn">Pemasukan</button>
+        </div>
+        <input id="amount" inputmode="numeric" placeholder="Jumlah (Rp)" aria-label="Jumlah">
+        <div class="f2">
+          <select id="cat" aria-label="Kategori"></select>
+          <input type="date" id="date" aria-label="Tanggal">
+        </div>
+        <input id="note" placeholder="Catatan (opsional), mis. makan siang" maxlength="80" aria-label="Catatan">
+        <div class="row"><button class="pri" id="save" type="button" style="flex:1">Simpan transaksi</button><button id="cancel" type="button" hidden>Batal</button></div>
+      </form>
+    </section>
+    <section class="box">
+      <h2>Pengeluaran per kategori</h2>
+      <div id="cats"></div>
+    </section>
+  </div>
+
+  <section class="box">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 style="margin:0">Riwayat transaksi</h2>
+      <div class="row"><button class="sm" id="copy">Salin sebagai CSV</button><button class="sm" id="clear">Hapus semua data</button></div>
+    </div>
+    <div class="filters">
+      <input id="q" placeholder="Cari catatan atau kategori" aria-label="Cari">
+      <select id="fType" aria-label="Filter jenis"><option value="">Semua jenis</option><option value="out">Pengeluaran</option><option value="in">Pemasukan</option></select>
+      <select id="fCat" aria-label="Filter kategori"></select>
+    </div>
+    <div id="list"></div>
+  </section>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+const CATS={out:[["Makanan","🍜"],["Transportasi","🛵"],["Belanja","🛍️"],["Tagihan","💡"],["Kesehatan","💊"],["Hiburan","🎬"],["Pendidikan","📚"],["Lainnya","📦"]],in:[["Gaji","💼"],["Bonus","🎁"],["Usaha","🏪"],["Lainnya","💰"]]};
+const ICON={};Object.values(CATS).flat().forEach(([n,i])=>ICON[n]=i);
+const $=id=>document.getElementById(id);
+const rp=n=>"Rp"+Math.round(n).toLocaleString("id-ID");
+const num=s=>parseInt(String(s).replace(/\D/g,""),10)||0;
+const fmtInput=e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""};
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let S={tx:[],budgets:{}},type="out",editId=null,month=today().slice(0,7);
+try{const r=localStorage.getItem("catatan-keuangan-v1");if(r){const p=JSON.parse(r);if(p&&Array.isArray(p.tx))S=p}}catch(e){}
+const persist=()=>{try{localStorage.setItem("catatan-keuangan-v1",JSON.stringify(S))}catch(e){}};
+let tt;const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),1800)};
+
+try{const th=localStorage.getItem("catatan-theme");if(th)document.documentElement.dataset.theme=th}catch(e){}
+$("theme").onclick=()=>{const dark=matchMedia("(prefers-color-scheme:dark)").matches;const cur=document.documentElement.dataset.theme||(dark?"dark":"light");const n=cur==="dark"?"light":"dark";document.documentElement.dataset.theme=n;try{localStorage.setItem("catatan-theme",n)}catch(e){}};
+
+function fillCats(){
+  $("cat").innerHTML=CATS[type].map(([n,i])=>`<option value="${n}">${i} ${n}</option>`).join("");
+  const all=[...new Set([...CATS.out,...CATS.in].map(c=>c[0]))];
+  const v=$("fCat").value;
+  $("fCat").innerHTML='<option value="">Semua kategori</option>'+all.map(n=>`<option>${n}</option>`).join("");
+  $("fCat").value=v;
+}
+function setType(t){type=t;$("tOut").classList.toggle("on",t==="out");$("tIn").classList.toggle("on",t==="in");fillCats()}
+$("tOut").onclick=()=>setType("out");$("tIn").onclick=()=>setType("in");
+$("amount").oninput=fmtInput;$("budget").oninput=fmtInput;
+
+function resetForm(){editId=null;$("amount").value="";$("note").value="";$("date").value=today();$("formTitle").textContent="Tambah transaksi";$("save").textContent="Simpan transaksi";$("cancel").hidden=true;setType("out")}
+$("cancel").onclick=resetForm;
+
+$("save").onclick=()=>{
+  const a=num($("amount").value);
+  if(!a){toast("Isi jumlah lebih dari nol");$("amount").focus();return}
+  if(!$("date").value){toast("Pilih tanggal");return}
+  const t={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,5),type,amount:a,cat:$("cat").value,date:$("date").value,note:$("note").value.trim()};
+  if(editId){S.tx=S.tx.map(x=>x.id===editId?t:x);toast("Transaksi diperbarui")}else{S.tx.push(t);toast("Transaksi disimpan")}
+  month=t.date.slice(0,7);$("month").value=month;
+  persist();resetForm();render();
+};
+
+$("saveBudget").onclick=()=>{const b=num($("budget").value);if(b)S.budgets[month]=b;else delete S.budgets[month];persist();render();toast(b?"Anggaran disimpan":"Anggaran dihapus")};
+
+const shift=d=>{const [y,m]=month.split("-").map(Number);const dt=new Date(y,m-1+d,1);month=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0");$("month").value=month;render()};
+$("prev").onclick=()=>shift(-1);$("next").onclick=()=>shift(1);
+$("month").onchange=e=>{if(e.target.value){month=e.target.value;render()}};
+["q","fType","fCat"].forEach(i=>$(i).oninput=render);
+
+function edit(id){
+  const t=S.tx.find(x=>x.id===id);if(!t)return;
+  editId=id;setType(t.type);$("amount").value=t.amount.toLocaleString("id-ID");$("cat").value=t.cat;$("date").value=t.date;$("note").value=t.note;
+  $("formTitle").textContent="Ubah transaksi";$("save").textContent="Simpan perubahan";$("cancel").hidden=false;
+  $("form").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function del(id){if(confirm("Hapus transaksi ini?")){S.tx=S.tx.filter(x=>x.id!==id);persist();render();toast("Transaksi dihapus")}}
+$("list").onclick=e=>{const b=e.target.closest("button[data-a]");if(!b)return;b.dataset.a==="e"?edit(b.dataset.id):del(b.dataset.id)};
+
+$("clear").onclick=()=>{if(confirm("Hapus semua transaksi dan anggaran? Tindakan ini tidak bisa dibatalkan.")){S={tx:[],budgets:{}};persist();render();toast("Semua data dihapus")}};
+$("copy").onclick=async()=>{
+  const rows=S.tx.filter(t=>t.date.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!rows.length){toast("Belum ada transaksi bulan ini");return}
+  const csv="tanggal,jenis,kategori,jumlah,catatan\n"+rows.map(t=>[t.date,t.type==="in"?"pemasukan":"pengeluaran",t.cat,t.amount,'"'+t.note.replace(/"/g,'""')+'"'].join(",")).join("\n");
+  try{await navigator.clipboard.writeText(csv);toast("CSV tersalin. Tempel di Excel atau Sheets")}catch(e){toast("Browser tidak mengizinkan menyalin")}
+};
+
+function render(){
+  const mt=S.tx.filter(t=>t.date.startsWith(month));
+  const inc=mt.filter(t=>t.type==="in").reduce((s,t)=>s+t.amount,0);
+  const exp=mt.filter(t=>t.type==="out").reduce((s,t)=>s+t.amount,0);
+  const bal=inc-exp;
+  $("sBal").textContent=(bal<0?"-":"")+rp(Math.abs(bal));$("sBal").className="big "+(bal<0?"out":"");
+  $("sIn").textContent=rp(inc);$("sOut").textContent=rp(exp);
+
+  const bg=S.budgets[month],f=$("bFill");
+  $("budget").value=bg?bg.toLocaleString("id-ID"):"";
+  if(bg){const p=exp/bg*100;f.style.width=Math.min(p,100)+"%";f.className=p>=100?"over":p>=80?"warn":"";
+    $("bText").textContent=exp>bg?`Melebihi anggaran ${rp(exp-bg)} (terpakai ${rp(exp)} dari ${rp(bg)})`:`Terpakai ${rp(exp)} dari ${rp(bg)}. Sisa ${rp(bg-exp)} (${Math.round(p)}%)`}
+  else{f.style.width="0";f.className="";$("bText").textContent="Belum ada batas anggaran untuk bulan ini."}
+
+  const by={};mt.filter(t=>t.type==="out").forEach(t=>by[t.cat]=(by[t.cat]||0)+t.amount);
+  const ent=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  $("cats").innerHTML=ent.length?ent.map(([n,v])=>`<div class="cat"><div class="t"><span>${ICON[n]||"📦"} ${esc(n)}</span><span><b>${rp(v)}</b> <span class="lbl">${Math.round(v/exp*100)}%</span></span></div><div class="bar"><i style="width:${v/ent[0][1]*100}%"></i></div></div>`).join(""):'<div class="empty">Belum ada pengeluaran bulan ini.</div>';
+
+  const q=$("q").value.toLowerCase(),ft=$("fType").value,fc=$("fCat").value;
+  const rows=mt.filter(t=>(!ft||t.type===ft)&&(!fc||t.cat===fc)&&(!q||(t.note+" "+t.cat).toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  $("list").innerHTML=rows.length?rows.map(t=>{const d=new Date(t.date+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
+    return `<div class="tx"><div class="dot">${ICON[t.cat]||"📦"}</div><div class="m"><b>${esc(t.note||t.cat)}</b><span>${esc(t.cat)} · ${d}</span></div><div class="amt ${t.type==="in"?"in":"out"}">${t.type==="in"?"+":"-"}${rp(t.amount)}</div><button class="sm" data-a="e" data-id="${t.id}" aria-label="Ubah">Ubah</button><button class="sm" data-a="d" data-id="${t.id}" aria-label="Hapus">Hapus</button></div>`}).join(""):`<div class="empty">${mt.length?"Tidak ada transaksi yang cocok dengan filter.":"Belum ada transaksi. Tambahkan yang pertama lewat formulir di atas."}</div>`;
+}
+
+$("month").value=month;fillCats();resetForm();render();
+</script>
+</body>
+</html>
